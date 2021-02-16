@@ -12,7 +12,11 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 inp = open(sys.argv[1], "r")
 
-wordlist = inp.readlines()
+linelist = inp.readlines()
+wordlist = []
+for line in linelist:
+    wordlist += line.split(' ')
+
 inp.close()
 
 output = open(sys.argv[2], "w+")
@@ -27,12 +31,13 @@ for i in range(len(wordlist)):
 BASE_DIR = ""
 TESTS = []
 if sys.argv[4] == "112":
-    BASE_DIR = "https://www2.ucsc.edu/courses/cmps112-wm/:/Old-Exams/"
-    TESTS = ["cmps112-2017q2-midterm.tt",
-             "cmps112-2017q4-midterm.tt",
-             "cmps112-2018q1-midterm.tt",
+    BASE_DIR = "https://www2.ucsc.edu/courses/cse112-wm/:/Old-Exams/"
+    TESTS = ["cmps112-2018q1-midterm.tt",
              "cmps112-2018q2-midterm.tt",
-             "cmps112-2018q4-midterm.tt ",
+             "cmps112-2018q4-midterm.tt",
+             "cmps112-2019q1-midterm.tt",
+             "cse112-2020q1-midterm.tt",
+             "cse112-2020q4-midterm.tt"
             ]
 elif sys.argv[4] == "104a":
     BASE_DIR = "https://www2.ucsc.edu/courses/cmps104a-wm/:/Old-Exams/"
@@ -73,41 +78,20 @@ for TEST in TESTS:
             tmp = t.strip().strip(".").strip('\\').strip("\'").strip("\\").strip(";").strip(".").strip(
                 ",").strip("(").strip(")").split('\\n')[0].strip(";").strip(".").strip(":").strip('\'')
             if tmp.isalpha() or tmp.isdigit():
-                if tmp in wordlist:
+                if tmp.lower() in wordlist:
                     num_matched += 1
                     num_tot += 1
                 else:
                     num_tot += 1
             else:
                 pass
-                # print(tmp)
 
-        # print(num_matched, num_tot) if num_matched/num_tot > 0.8
         if num_tot == 0:
             index += 1
             continue
         if(num_matched/num_tot > accuracy):
-            # print(num_matched, num_tot)
             output.write("Question " + str(index) + " on Free Response on " + TEST + " with accuracy " +
                          str(num_matched/num_tot) + ": " + '\n' + (len(str(index)) + 1) * " " + elem + '\n\n\n')
         index += 1
-    for part, each in enumerate(mc):
-        index = 1
-        for elem in each:
-            num_matched = 0
-            num_tot = 0
-            temp = str(elem).strip().split()
-            for tmp in temp:
-                tmp = tmp.strip()
-                if tmp.isalpha() or tmp.isdigit():
-                    if tmp in wordlist:
-                        num_matched += 1
-                    num_tot += 1
-            if num_tot == 0:
-                index += 1
-                continue
-            if(num_matched/num_tot > accuracy):
-                output.write("Question " + str(index) + " on Multiple Choice part " + str(part + 1) + " on " + TEST +
-                             " with accuracy " + str(num_matched/num_tot) + ": " + '\n' + (len(str(len(each))) + 1) * " " + elem + '\n\n\n')
-            index += 1
+
 output.close()
